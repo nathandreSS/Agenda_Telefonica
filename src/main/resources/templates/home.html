@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Agenda Telefonica</title>
+
+    <link href="/css/reset.css" rel="stylesheet" />
+    <link href="/css/style.css" rel="stylesheet" />
+
+</head>
+<body>
+    <header>
+        <h1>Agenda Telefonica</h1>
+    </header>
+    <div>
+        <form id="form">
+            <input type="text" placeholder="Nome" id="primeiroNome"/>
+            <input type="text" placeholder="Sobrenome" id="sobrenome"/>
+            <input type="text" placeholder="email" id="email"/>
+            <button type="submit" value="Submit">Testar</button>
+            <p id="error"></p>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('form');
+        form.addEventListener('submit', sendJSON);
+        const error = document.getElementById('error');
+        function sendJSON(event) {
+            event.preventDefault();
+            const data = {
+                primeiroNome: document.getElementById("primeiroNome").value,
+                sobrenome: document.getElementById("sobrenome").value,
+                email: document.getElementById("email").value,
+            }
+
+            const json = JSON.stringify(data);
+
+            const xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    console.log("message: " + xhr.response);
+                    const response = JSON.parse(xhr.response);
+                    console.log(response.message);
+                    error.textContent = response.message;
+                }
+            }
+
+            xhr.open("POST", "/teste");
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(json);
+        }
+    </script>
+</body>
+</html>

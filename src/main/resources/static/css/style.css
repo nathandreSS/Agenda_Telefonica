@@ -1,0 +1,47 @@
+body {
+    background-color: #a0adbd;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+
+}
+
+body > div {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 100vw;
+    background-color: #749fd4;
+    padding: 5px;
+
+}
+
+h1 {
+    font-weight: 500;
+    font-size: 30px;
+    font-family: "Arial Black";
+    color: white;
+}
+
+input {
+    height: 30px;
+    width: 200px;
+    border-radius: 10px;
+    border: 1px solid white;
+}
+
+button {
+    height: 35px;
+    width: 100px;
+    border-radius: 10px;
+    border: 1px solid white;
+}
