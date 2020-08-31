@@ -8,5 +8,5 @@ public interface TelefonePersistence {
 
     void update(TelefoneEntity telefone);
 
-    void delete(Long enderecoId);
+    void delete(Long telefoneId);
 }

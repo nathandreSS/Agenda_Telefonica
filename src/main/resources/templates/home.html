@@ -12,43 +12,201 @@
     <header>
         <h1>Agenda Telefonica</h1>
     </header>
-    <div>
-        <form id="form">
-            <input type="text" placeholder="Nome" id="primeiroNome"/>
-            <input type="text" placeholder="Sobrenome" id="sobrenome"/>
-            <input type="text" placeholder="email" id="email"/>
-            <button type="submit" value="Submit">Testar</button>
-            <p id="error"></p>
-        </form>
+    <div id="content">
+        <div id="contact-list">
+        </div>
     </div>
-
     <script>
-        const form = document.getElementById('form');
-        form.addEventListener('submit', sendJSON);
-        const error = document.getElementById('error');
-        function sendJSON(event) {
-            event.preventDefault();
-            const data = {
-                primeiroNome: document.getElementById("primeiroNome").value,
-                sobrenome: document.getElementById("sobrenome").value,
-                email: document.getElementById("email").value,
+        window.addEventListener('load', loadContacts);
+
+        function renderList(contacts) {
+            const divList = document.getElementById('contact-list');
+            divList.innerHTML = '<h2 id="contatos-title">Contatos</h2>';
+            contacts.forEach(contact => {
+                const item = document.createElement("div");
+                item.setAttribute("id", contact.id);
+                item.setAttribute("class", "item");
+                item.innerHTML = "<button class='accordion' type='button'>a</button>" +
+                    "<div class='panel'>" +
+                        "<input class='id' type='hidden'/>" +
+                        "<div class='name-div'>" +
+                            "<div class='input-div'>" +
+                                "<label>Nome:</label>" +
+                                "<input placeholder='Nome' class='firstName'/> " +
+                            "</div>" +
+                            "<div class='input-div'>" +
+                                "<label>Sobrenome:</label>" +
+                                "<input placeholder='Sobrenome' class='lastName'/>" +
+                            "</div>" +
+                        "</div>" +
+                        "<div class='email-div'>" +
+                            "<div class='input-div'>" +
+                                "<label>Email:</label>" +
+                                "<input placeholder='Email: usuario@dominio.com' class='email'/>" +
+                            "</div>" +
+                        "</div>" +
+                        "<div class='address-div'>" +
+                            "<div class='ZIPCode-number-div' >" +
+                                "<div class='input-div'>" +
+                                    "<label>CEP:</label>" +
+                                    "<input placeholder='CEP: 12345-123' class='ZIPCode'/>" +
+                                "</div>" +
+                                "<div class='input-div'>" +
+                                    "<label>Numero:</label>" +
+                                    "<input placeholder='Numero' class='number'/>" +
+                                "</div>" +
+                            "</div>" +
+                            "<div class='complement-div'>" +
+                                "<div class='input-div'>" +
+                                    "<label>Complemento:</label>" +
+                                    "<input placeholder='Complemento' class='complement'/>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>" +
+                        "<div class='phone-div'>" +
+                            "<div class='input-div'>" +
+                                "<label>Telefones:</label>" +
+                                "<div class='phone-input-div'>" +
+                                "</div>" +
+                                "<button type='button' class='add-phone'>Adicionar Telefone</button>" +
+                            "</div>" +
+                        "</div>" +
+                        "<div class='contact-buttons'>" +
+                            "<button type='button' class='save-contact'>Salvar Contato</button>" +
+                            "<button type='button' class='remove-contact'>Remover Contato</button>" +
+                        "</div>" +
+                    "</div>";
+
+                const accordion = item.querySelector('.accordion');
+                accordion.textContent = contact.name;
+                accordion.addEventListener('click', () => handleWithAccordionClick(contact.id));
+                const panel = item.querySelector('.panel')
+                panel.setAttribute("id", `panel${contact.id}`);
+                panel.style.display = "none";
+                item.querySelector('.id').setAttribute("value", contact.id);
+                const name = contact.name.split(" ");
+                item.querySelector('.firstName').setAttribute("value", contact.firstName == "" ? "" : name[0]);
+                item.querySelector('.lastName').setAttribute("value", contact.lastName == "" ? "" :name[1]);
+                item.querySelector('.email').setAttribute("value", contact.email ? contact.email : "");
+                item.querySelector('.ZIPCode').setAttribute("value", !!contact.endereco ? contact.endereco.cep : "");
+                item.querySelector('.number').setAttribute("value", !!contact.endereco ? contact.endereco.numero : "");
+                item.querySelector('.complement').setAttribute("value", !!contact.endereco ? contact.endereco.complemento : "");
+                const phoneInputDiv = item.querySelector('.phone-input-div');
+                contact.telefone.forEach(phone => {
+                    const inputPhone = document.createElement("input");
+                    inputPhone.setAttribute("class", "phone");
+                    inputPhone.setAttribute("value", phone);
+                    phoneInputDiv.appendChild(inputPhone);
+                });
+                item.querySelector('.add-phone').addEventListener('click', () => handleWithAddPhone(phoneInputDiv));
+                item.querySelector('.save-contact').addEventListener('click', () => saveContact(accordion, panel, contact.id));
+                const removeContactButton = item.querySelector('.remove-contact')
+                if(!contact.id) {
+                    removeContactButton.setAttribute("disabled", "true")
+                    removeContactButton.style.opacity =  0.5;
+                    removeContactButton.style.cursor = 'not-allowed';
+                } else {
+                    removeContactButton.addEventListener('click', () => removeContact(contact.id));
+                }
+                divList.appendChild(item);
+            });
+        };
+
+        function handleWithAddPhone(phoneInputDiv) {
+            const input = document.createElement("input");
+            input.setAttribute("placeholder", "Telefone: (99)9999-9999")
+            phoneInputDiv.appendChild(input);
+        }
+        function handleWithAccordionClick(id) {
+            const panel = document.getElementById(`panel${id}`);
+            panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function loadContacts() {
+            const xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    const response = JSON.parse(xhr.response);
+                    const newContact = {
+                        name: "Novo Contato",
+                        firstName: "",
+                        lastName: "",
+                        telefone: [],
+                        email: "",
+                        endereco: {
+                            cep: "",
+                            numero: "",
+                            complemento: ""
+                        }
+                    }
+                    response.push(newContact);
+                    renderList(response);
+                }
             }
+            xhr.open("GET", "/listar");
+            xhr.send();
+        }
+        function saveContact(accordion, panel, id) {
+            const data = {
+                nomeObject: {
+                    firstName: panel.querySelector('.firstName').value,
+                    lastName: panel.querySelector('.lastName').value
+                },
+                emailObject: {
+                    email: panel.querySelector('.email').value
+                },
+                telefoneObject: [],
+                enderecoObject: {
+                    cep: panel.querySelector('.ZIPCode').value,
+                    numero: panel.querySelector('.number').value,
+                    complemento: panel.querySelector('.complement').value
+                }
+            }
+            if(data.nomeObject.firstName === "") {
+                alert("Nome é obrigatório para a criação de um Contato");
+                return;
+            }
+            data.emailObject.email === "" && delete data.emailObject;
+            (data.enderecoObject.cep === "" && data.enderecoObject.numero === "") && delete data.enderecoObject;
+            const phoneInputDiv = panel.querySelector('.phone-input-div');
+            phoneInputDiv.childNodes.forEach( node => {
+                if(node.value != "") data.telefoneObject.push({telefone: node.value});
+            });
 
             const json = JSON.stringify(data);
 
             const xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
-                    console.log("message: " + xhr.response);
                     const response = JSON.parse(xhr.response);
-                    console.log(response.message);
-                    error.textContent = response.message;
+                    if(response.statusCode !== "200") {
+                        alert(response.message);
+                    } else {
+                        loadContacts();
+                    }
                 }
             }
 
-            xhr.open("POST", "/teste");
+            if(id) xhr.open("PUT", `/atualizar?contatoId=${id}`);
+            else xhr.open("POST", `/adicionar`);
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(json);
+        }
+        function removeContact(id) {
+            const xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    const response = JSON.parse(xhr.response);
+                    if(response.statusCode === "400") {
+                        alert(response.message);
+                    } else {
+                        loadContacts();
+                    }
+                }
+            }
+
+            xhr.open("DELETE", `/remover?contatoId=${id}`);
+            xhr.send();
         }
     </script>
 </body>

@@ -5,7 +5,4 @@ import com.nathan.agenda.boot.agenda_telefonica.ports.backservices.queries.Ender
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class EnderecoRepositoryImpl extends AbstractRepository<EnderecoEntity, Long> implements EnderecoRepository {
-
-
-}
+public class EnderecoRepositoryImpl extends AbstractRepository<EnderecoEntity, Long> implements EnderecoRepository {}

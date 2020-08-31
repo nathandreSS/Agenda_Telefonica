@@ -33,7 +33,7 @@ public class Email {
     public boolean validate(String email) throws EmailInvalido, EmailVazio {
 
         String pattern = "[A-Z a-z 0-9 !-~]{1,64}@{1}[A-Z a-z 0-9]{1,255}(.com)";
-        if(email == "") throw new EmailVazio();
+        if(email == "") return true;
         if(!email.matches(pattern)) throw new EmailInvalido();
         return true;
     }

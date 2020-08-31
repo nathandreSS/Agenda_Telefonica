@@ -42,9 +42,4 @@ public class TelefoneEntity extends AbstractEntity<Long> {
         this.numero = telefone.getTelefone();
         this.contato = contato;
     }
-
-    @Override
-    public Long getId() {
-        return super.getId();
-    }
 }

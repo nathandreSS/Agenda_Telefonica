@@ -36,15 +36,18 @@ public class AdicionarContatoServiceImpl implements AdicionarContatoService {
         String name = contato.getNomeObject().getFirstName()
                 + " " + contato.getNomeObject().getLastName();
 
-        ContatoEntity contatoWithThisNameAlreadyExists = contatoRepository.findByName(name);
-        if(contatoWithThisNameAlreadyExists != null) {
-            throw new Error("Já existe um contato com esse nome");
+        try {
+            contatoRepository.findByName(name);
+        } catch(Error e) {
+            throw new Error(e.getMessage());
         }
+
         ContatoEntity contatoEntity = new ContatoEntity(contato);
         contatoPersistence.save(contatoEntity);
         contatoEntity = contatoRepository.findByName(name);
 
         for(int i = 0; i < contato.getTelefoneObject().size(); i++) {
+
             TelefoneEntity telefone = new TelefoneEntity(contato.getTelefoneObject().get(i).getTelefone(), contatoEntity);
             telefonePersistence.save(telefone);
         }

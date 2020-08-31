@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ContatoEntity extends AbstractEntity<Long>{
+public class ContatoEntity extends AbstractEntity<Long> {
 
     @Column(name = "name", unique = true)
     private String name;
@@ -39,23 +39,31 @@ public class ContatoEntity extends AbstractEntity<Long>{
     public ContatoEntity(Contato contato) {
         this.name = contato.getNomeObject().getFirstName() + " " + contato.getNomeObject().getLastName();
 
-        for(int i = 0; i < contato.getTelefoneObject().size(); i++) {
+        for (int i = 0; i < contato.getTelefoneObject().size(); i++) {
             this.telefone.add(new TelefoneEntity(contato.getTelefoneObject().get(i)));
         }
 
-        this.email = contato.getEmailObject().getEmail();
-        this.endereco = new EnderecoEntity(contato.getEnderecoObject());
+        this.email = contato.getEmailObject() != null ? contato.getEmailObject().getEmail() : null;
+        this.endereco = contato.getEnderecoObject() != null ? new EnderecoEntity(contato.getEnderecoObject()) : null;
     }
 
     public ContatoEntity(Contato contato, Long id) {
         this.id = id;
         this.name = contato.getNomeObject().getFirstName() + " " + contato.getNomeObject().getLastName();
 
-        for(int i = 0; i < contato.getTelefoneObject().size(); i++) {
+        for (int i = 0; i < contato.getTelefoneObject().size(); i++) {
             this.telefone.add(new TelefoneEntity(contato.getTelefoneObject().get(i)));
         }
 
-        this.email = contato.getEmailObject().getEmail();
-        this.endereco = new EnderecoEntity(contato.getEnderecoObject());
+        if (contato.getEnderecoObject() != null) {
+            this.endereco = new EnderecoEntity(contato.getEnderecoObject());
+        } else {
+            this.endereco = null;
+        }
+        if (contato.getEmailObject() != null) {
+            this.email = contato.getEmailObject().getEmail();
+        } else {
+            this.email = null;
+        }
     }
 }

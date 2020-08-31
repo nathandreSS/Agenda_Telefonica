@@ -4,9 +4,9 @@ import com.nathan.agenda.boot.agenda_telefonica.domain.Contato;
 import com.nathan.agenda.boot.agenda_telefonica.jpa_repository.entity.ContatoEntity;
 import com.nathan.agenda.boot.agenda_telefonica.jpa_repository.entity.TelefoneEntity;
 import com.nathan.agenda.boot.agenda_telefonica.ports.backservices.modifiers.ContatoPersistence;
+import com.nathan.agenda.boot.agenda_telefonica.ports.backservices.modifiers.EnderecoPersistence;
 import com.nathan.agenda.boot.agenda_telefonica.ports.backservices.modifiers.TelefonePersistence;
 import com.nathan.agenda.boot.agenda_telefonica.ports.backservices.queries.ContatoRepository;
-import com.nathan.agenda.boot.agenda_telefonica.ports.backservices.queries.TelefoneRepository;
 import com.nathan.agenda.boot.agenda_telefonica.ports.frontend.modifiers.atualizarContato.AtualizarContatoCommand;
 import com.nathan.agenda.boot.agenda_telefonica.ports.frontend.modifiers.atualizarContato.AtualizarContatoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,22 +23,41 @@ public class AtualizarContatoServiceImpl implements AtualizarContatoService {
     @Autowired
     private ContatoRepository contatoRepository;
     @Autowired
-    private TelefoneRepository telefoneRepository;
+    private EnderecoPersistence enderecoPersistence;
     @Autowired
     private TelefonePersistence telefonePersistence;
 
     @Override
     public void execute(AtualizarContatoCommand command) {
-        Contato contato = new Contato(command.getContato());
-        ContatoEntity updateContato = new ContatoEntity(command.getContato(), command.getId());
-        contatoPersistence.update(updateContato);
+        try {
+            Contato contato = new Contato(command.getContato());
+            String name = contato.getNomeObject().getFirstName() + " " + contato.getNomeObject().getLastName();
 
-        List<TelefoneEntity> phones = contatoRepository.findById(command.getId()).getTelefone();
-        System.out.println(phones.get(0).getId());
-//        for (int i = 0; i < contato.getTelefoneObject().size() ; i++) {
-//            System.out.println(phones.get(i).getId());
-//            TelefoneEntity updatePhone = new TelefoneEntity(phones.get(i).getId(), contato.getTelefoneObject().get(i), updateContato);
-//            telefonePersistence.update(updatePhone);
-//        }
+            ContatoEntity contactWithThisNameAlreadyExists = contatoRepository.findByName(name);
+            if (contactWithThisNameAlreadyExists != null && contactWithThisNameAlreadyExists.getId() != command.getId()) {
+                throw new Error("Já existe um contato com esse nome");
+            }
+
+            ContatoEntity contatoBeforeUpdate = contatoRepository.findById(command.getId());
+            if(contatoBeforeUpdate == null) throw new Error("Contato não encontrado para a atualização.");
+            if(contato.getEnderecoObject() == null && contatoBeforeUpdate.getEndereco() != null) {
+                enderecoPersistence.delete(contatoBeforeUpdate.getEndereco().getId());
+            }
+            ContatoEntity contatoEntity = new ContatoEntity(command.getContato(), command.getId());
+            List<TelefoneEntity> phones = contatoBeforeUpdate.getTelefone();
+            int biggestList = Integer.max(contato.getTelefoneObject().size(), phones.size());
+            for (int i = 0; i < biggestList; i++) {
+                if (i < contato.getTelefoneObject().size()) {
+                    Long id = i < phones.size() ? phones.get(i).getId() : null;
+                    TelefoneEntity updatePhone = new TelefoneEntity(id, contato.getTelefoneObject().get(i), contatoEntity);
+                    telefonePersistence.update(updatePhone);
+                } else {
+                    telefonePersistence.delete(phones.get(i).getId());
+                }
+            }
+            contatoPersistence.update(contatoEntity);
+        } catch(Error error) {
+            throw new Error(error.getMessage());
+        }
     }
 }

@@ -1,17 +1,17 @@
 body {
-    background-color: #a0adbd;
+    background-color: #e8e6e1;
     width: 100vw;
     margin: 0;
     padding: 0;
-
+    color: brown;
 }
 
-body > div {
-    height: 100vh;
+#content {
+    min-height: 100vh;
+    max-width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
-
 }
 
 header {
@@ -20,7 +20,7 @@ header {
     justify-content: center;
     height: 40px;
     width: 100vw;
-    background-color: #749fd4;
+    background-color: brown;
     padding: 5px;
 
 }
@@ -31,17 +31,130 @@ h1 {
     font-family: "Arial Black";
     color: white;
 }
+#contatos-title {
+    width: 100%;
+    font-weight: 500;
+    font-size: 25px;
+    text-align: center;
+    line-height: 30px;
+    font-family: "Arial Black";
+    color: brown;
+}
+.input-div, .phone-input-div {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
 
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
+    border: 2px solid brown;
+    background-color: brown;
+    margin-top: 5px;
+}
+
+.accordion {
+    width: 100%;
+    height: 35px;
+    text-align: start;
+    background-color: transparent;
+    color: white;
+    border: 0;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    outline: 0;
+}
+
+.accordion:hover {
+    cursor: pointer;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    color: white;
+}
+
+.name-div {
+    display: flex;
+    flex-direction: row;
+}
+
+.email-div {
+
+}
+.email-div input {
+    width: 100%;
+}
+.ZIPCode-number-div {
+    display: flex;
+    flex-direction: row;
+}
+.complement-div input{
+    width: 100%;
+}
+.phone-input-div {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.phone-input-div input:first-of-type {
+    margin-left: -3px;
+}
+.add-phone {
+    margin-top: 18px;
+    height: 35px;
+    border: 0;
+    border-radius: 10px;
+    outline: 0;
+    background-color: white;
+    color: brown;
+}
+.contact-buttons {
+    display: flex;
+    flex-direction: row;
+    padding: 5px;
+    justify-content: space-between;
+}
+.contact-buttons button {
+    width: 200px;
+    height: 35px;
+    border: 0;
+    outline: 0;
+    border-radius: 10px;
+    background-color: white;
+    color: brown;
+}
+.save-contact {
+    background-color: green;
+    color: white;
+}
 input {
     height: 30px;
     width: 200px;
-    border-radius: 10px;
-    border: 1px solid white;
+    border-bottom-right-radius: 10px;
+    border:0;
+    border-bottom: 2px solid white;
+    background-color: transparent;
+    outline: 0;
+    color: white;
+}
+::placeholder {
+    color: white;
+    opacity: 0.5;
 }
 
-button {
-    height: 35px;
-    width: 100px;
-    border-radius: 10px;
-    border: 1px solid white;
+#contact-list {
+    background-color: white;
+    min-height: 100vh;
+    min-width: 600px;
+    padding: 20px;
+}
+
+button:hover {
+    cursor: pointer;
 }

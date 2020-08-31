@@ -33,8 +33,14 @@ public class Contato {
         }
         this.nomeObject = nome;
         this.telefoneObject = telefone;
-        this.emailObject = email;
-        this.enderecoObject = endereco;
+
+        try {
+            this.enderecoObject = endereco != null ? new Endereco(endereco) : null;
+        } catch (Error e) {
+            throw new Error(e.getMessage());
+        }
+        this.emailObject = email != null ? new Email(email) : new Email("");
+
     }
 
     public Contato(Contato contato) {
@@ -52,9 +58,13 @@ public class Contato {
 
             this.telefoneObject.add(new Telefone(contato.getTelefoneObject().get(i)));
         }
+        try {
+            this.enderecoObject = contato.getEnderecoObject() != null ? new Endereco(contato.getEnderecoObject()) : null;
+        } catch (Error e) {
+            throw new Error(e.getMessage());
+        }
+        this.emailObject = contato.getEmailObject() != null ? new Email(contato.getEmailObject()) : new Email("");
 
-        this.emailObject = new Email(contato.getEmailObject());
-        this.enderecoObject = new Endereco(contato.getEnderecoObject());
     }
 
     public boolean validate(Nome nome, List<Telefone> telefone) throws NomeObrigatorio, TelefoneObrigatorio {
